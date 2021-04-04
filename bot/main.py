@@ -17,6 +17,7 @@ es = Elasticsearch([{'host': settings.ES_HOST, 'port': settings.ES_PORT}])
 
 sad_emojis = ['😔', '👀', '🕵️‍♂️', '🦸‍♂️', '🎲', '🔎', '😿', '🪂', '🌠', '☂', '💔', '❌']
 
+
 @bot.message_handler(commands=['start'])
 def start(message):
     bot.send_message(message.chat.id, str(message))

@@ -33,38 +33,41 @@ class MemePipeline(object):
             # downloading file
             http_request = requests.get(image_url)
             if http_request.status_code == 200:
-                file_ext = mimetypes.guess_extension(http_request.headers['content-type'])
-                tmp_file_name = os.path.join(bot_settings.TMP_DIR, str(uuid.uuid4()) + file_ext)
                 sha256_hash = hashlib.sha256(http_request.content).hexdigest()
 
-                with open(tmp_file_name, "wb") as output_image:
-                    output_image.write(http_request.content)
+                # checking if www and www/static exists
+                if not os.path.exists(bot_settings.STATIC_LOCAL_FOLDER):
+                    os.makedirs(bot_settings.STATIC_LOCAL_FOLDER, exist_ok=True)
 
+                # saving image
+                file_ext = mimetypes.guess_extension(http_request.headers['content-type'])
                 image_folder = os.path.join(bot_settings.STATIC_LOCAL_FOLDER, sha256_hash)
                 os.mkdir(image_folder)
 
-                image_final_filename = bot_settings.DEFAULT_IMAGE_FILENAME + file_ext
-                image_full_path = os.path.join(image_folder, image_final_filename)
-                os.rename(tmp_file_name, image_full_path)
+                image_filename = bot_settings.DEFAULT_IMAGE_FILENAME + file_ext
+                image_full_path = os.path.join(image_folder, image_filename)
+
+                with open(image_full_path, "wb") as output_image:
+                    output_image.write(http_request.content)
 
                 # generating thumbnail
                 thumb = Image.open(image_full_path)
                 thumb_size = ((thumb.width * bot_settings.THUMBNAILS_HEIGHT / thumb.height), bot_settings.THUMBNAILS_HEIGHT)
                 thumb.thumbnail(thumb_size)
-                thumb.save(os.path.join(image_folder, bot_settings.THUMBNAIL_PREFIX + image_final_filename))
+                thumb.save(os.path.join(image_folder, bot_settings.THUMBNAIL_PREFIX + image_filename))
 
                 # adding image to ES
                 es.index(index=bot_settings.ES_INDEX_NAME, doc_type=bot_settings.ES_DOC_TYPE, id=sha256_hash, body={
                     "id": sha256_hash,
                     "tags": item['tags'],
-                    "file_name": image_final_filename,
+                    "file_name": image_filename,
                     "article_url": item['url'],
                     "original_url": image_url
                 })
 
                 # save data to DB
                 media_row = IndexedMediaTable(url=image_url, id=sha256_hash, hash=sha256_hash,
-                                              file_name=image_final_filename, tags=json.dumps(item['tags']))
+                                              file_name=image_filename, tags=json.dumps(item['tags']))
                 db_session.add(media_row)
                 db_session.commit()
 
