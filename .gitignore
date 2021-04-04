@@ -1,0 +1,9 @@
+/.idea
+/__pycache__
+/bot/settings.py
+/venv/
+/crawler_data.db
+/tmp/*
+!/tmp/
+/www/static/*
+!/www/static/
