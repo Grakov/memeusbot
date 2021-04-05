@@ -1,5 +1,5 @@
 /.idea
-/__pycache__
+__pycache__
 /bot/settings.py
 /venv
 /crawler_data.db

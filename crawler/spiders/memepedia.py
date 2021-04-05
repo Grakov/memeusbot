@@ -15,6 +15,10 @@ MEMEPEDIA_GALLERY_SELECTOR = 'div.bb-post-gallery-content ul.bb-gl-slide li figu
 MEMEPEDIA_EXCLUDES = [
     'https://memepedia.ru/wp-content/uploads/2021/01/tg5.jpg'
 ]
+MEMEPEDIA_URL_EXCLUDES = [
+    'wp-login',
+    'tel:'
+]
 MEMEPEDIA_SUITABLE_CATEGORIES = {
     'Мемы': 'meme',
     'Омагад': 'article'
@@ -36,7 +40,7 @@ class MemeSpider(scrapy.Spider):
     ]
 
     def parse(self, response):
-        tags = []
+        tags = set()
         pictures = set()
         category = None
         if not response.headers['content-type'].decode("utf-8").split(';')[0].lower() in MEMEPEDIA_ACCEPTED_CONTENT_TYPES:
@@ -53,9 +57,9 @@ class MemeSpider(scrapy.Spider):
             title = response.css(MEMEPEDIA_TITLE_SELECTOR).css('::text').get().strip()
             headline = response.css(MEMEPEDIA_HEADLINE_SELECTOR).css('::text').get().strip()
             if title != '':
-                tags.append(title)
+                tags.add(title)
             if headline != '':
-                tags.append(headline)
+                tags.add(headline)
 
             # add preview picture
             preview_image = response.css(MEMEPEDIA_PREVIEW_SELECTOR)
@@ -75,7 +79,7 @@ class MemeSpider(scrapy.Spider):
                 pictures.add(src)
 
                 if tag is not None:
-                    tags.append(tag)
+                    tags.add(tag)
 
             # parse galleries
             for item in response.css(MEMEPEDIA_GALLERY_SELECTOR):
@@ -84,11 +88,11 @@ class MemeSpider(scrapy.Spider):
                     pictures.add(src.strip())
 
             if len(tags) > 0:
-                yield MemeArticle(url=response.url, images=list(pictures), tags=tags)
+                yield MemeArticle(url=response.url, images=list(pictures), tags=list(tags))
 
         # save data to DB
         if not check_indexed_url(response.url, IndexedPagesTable):
-            page_row = IndexedPagesTable(url=response.url, tags=json.dumps(tags), media=json.dumps(list(pictures)))
+            page_row = IndexedPagesTable(url=response.url, tags=json.dumps(list(tags)), media=json.dumps(list(pictures)))
             db_session.add(page_row)
             db_session.commit()
 
@@ -96,6 +100,11 @@ class MemeSpider(scrapy.Spider):
         for next_page in response.css('a'):
             url = next_page.attrib.get('href', None)
             if url is not None:
-                if (not check_indexed_url(url, IndexedPagesTable) and url.find("wp-login") == -1) or url in self.start_urls:
+                if (not check_indexed_url(url, IndexedPagesTable) and self.is_allowed_url(url)) or url in self.start_urls:
                     yield response.follow(url, self.parse)
 
+    def is_allowed_url(self, url):
+        for rule in MEMEPEDIA_URL_EXCLUDES:
+            if url.find(rule) != -1:
+                return False
+        return True

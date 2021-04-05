@@ -31,7 +31,7 @@ ES_PORT = 9200
 ES_DOC_TYPE = "_doc"
 ```
 
-You can also check Scrapy [configuration](https://docs.scrapy.org/en/latest/topics/settings.html) (rate-limits, etc) on ``crawler/settings.py`` or change DB connection settings on ``crawler/spider_bot.db`` (SQLAlchemy).
+You can also check Scrapy [configuration](https://docs.scrapy.org/en/latest/topics/settings.html) (rate-limits, etc) on ``crawler/settings.py`` or change DB connection settings on ``crawler/spider_bot.py`` (SQLAlchemy).
 
 ## Running crawler
 Run this command to start ``crawler`` in the top directory of project:
@@ -57,13 +57,17 @@ python bot\main.py
 |   +--- settings_example.py
 |   +--- __init__.py
 +--- crawler                # Scrapy crawler directory
-|   +--- items.py           # 
+|   +--- items.py 
 |   +--- models.py          # DB tables models
 |   +--- pipelines.py       # Saving scrapped data
 |   +--- settings.py        # Scrapy settings
-|   +--- spiders            # 
+|   +--- spiders
 |   |   +--- memepedia.py   # Spider for memepedia.ru
 |   +--- spider_db.py       # DB config
+|--- es_meme                # Tools for working with ES
+|   +--- importer.py        # Importing data to memeus ES index
+|   +--- search.py          # Searching in memeus ES index
+|   +--- __init.py__
 +--- scrapy.cfg             # Scrapy cfg-file
 +--- www                    # HTTP root
 |   +--- index.html

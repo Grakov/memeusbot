@@ -21,6 +21,7 @@ class IndexedMediaTable(Base):
     hash = Column(String)
     file_name = Column(String)
     tags = Column(String)
+    article_url = Column(String)
 
     def __repr__(self):
         return f"{self.url} ({self.hash})"

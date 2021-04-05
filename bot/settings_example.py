@@ -16,9 +16,9 @@ DEFAULT_IMAGE_FILENAME = "image"
 THUMBNAILS_HEIGHT = 200
 THUMBNAIL_PREFIX = "thumb_"
 
-ES_INDEX_NAME = "memeus"
 ES_HOST = "localhost"
 ES_PORT = 9200
+ES_INDEX_NAME = "memeus"
 ES_DOC_TYPE = "_doc"
 
 # TODO: read about installing dictionaries
