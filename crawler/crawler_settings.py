@@ -1,16 +1,12 @@
 import os
-
-BOT_TOKEN = "TOKEN:GOES_HERE"
-DEBUG = True
+import sys
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TMP_DIR = os.path.join(BASE_DIR, 'tmp')
 
-RESULTS_LIMIT = None
+# workaround for crawler ModuleNotFoundError: No module named ...
+sys.path.insert(0, BASE_DIR)
 
-STATIC_PROTO = "https://"
-STATIC_DOMAIN = "example.com"
-STATIC_BASE_URL = "/static/"
 STATIC_LOCAL_FOLDER = os.path.join(BASE_DIR, 'www', 'static')
 DEFAULT_IMAGE_FILENAME = "image"
 THUMBNAILS_HEIGHT = 200
@@ -21,8 +17,6 @@ ES_PORT = 9200
 ES_INDEX_NAME = "memeus"
 ES_DOC_TYPE = "_doc"
 
-# TODO: read about installing dictionaries
-# https://www.elastic.co/guide/en/elasticsearch/guide/current/hunspell.html
 ES_INDEX_SETTINGS = {
     "settings": {
         "number_of_shards": 1,
@@ -53,6 +47,19 @@ ES_INDEX_SETTINGS = {
             },
             "tags": {
                 "type": "text",
+                "fielddata": True,
+            },
+            "alt_tags": {
+                "type": "text",
+                "fielddata": True,
+            },
+            "description": {
+                "type": "text",
+                "fielddata": True,
+            },
+            "meaning": {
+                "type": "text",
+                "fielddata": True,
             },
             "file_name": {
                 "type": "keyword",
@@ -66,7 +73,3 @@ ES_INDEX_SETTINGS = {
         }
     }
 }
-
-
-def construct_url(prefix, file_name):
-    return STATIC_PROTO + STATIC_DOMAIN + STATIC_BASE_URL + prefix + '/' + file_name

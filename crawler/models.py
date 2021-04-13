@@ -8,6 +8,7 @@ class IndexedPagesTable(Base):
     __tablename__ = 'indexed_pages'
     url = Column(String, primary_key=True)
     tags = Column(String)
+    alt_tags = Column(String)
     media = Column(String)
 
     def __repr__(self):
@@ -21,6 +22,9 @@ class IndexedMediaTable(Base):
     hash = Column(String)
     file_name = Column(String)
     tags = Column(String)
+    alt_tags = Column(String)
+    description = Column(String)
+    meaning = Column(String)
     article_url = Column(String)
 
     def __repr__(self):

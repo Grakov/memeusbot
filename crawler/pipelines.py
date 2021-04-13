@@ -4,20 +4,19 @@ from elasticsearch_dsl import Search
 import requests
 import mimetypes
 import os
-import uuid
 import hashlib
 import json
 from PIL import Image
 
 from crawler.spider_db import *
-from bot import settings as bot_settings
-from es_meme.importer import MemeImporter
+from crawler import crawler_settings as settings
+from crawler.importer import MemeImporter
 
-es = Elasticsearch([{'host': bot_settings.ES_HOST, 'port': bot_settings.ES_PORT}])
+es = Elasticsearch([{'host': settings.ES_HOST, 'port': settings.ES_PORT}])
 
 # check, if index exists
-if not es.indices.exists(index=bot_settings.ES_INDEX_NAME):
-    es.indices.create(index=bot_settings.ES_INDEX_NAME, body=bot_settings.ES_INDEX_SETTINGS)
+if not es.indices.exists(index=settings.ES_INDEX_NAME):
+    es.indices.create(index=settings.ES_INDEX_NAME, body=settings.ES_INDEX_SETTINGS)
 
 
 class MemePipeline(object):
@@ -25,11 +24,11 @@ class MemePipeline(object):
         for image_url in item['images']:
 
             # check if we already downloaded image
-            es_query = Search().index(bot_settings.ES_INDEX_NAME).using(client=es).query("match", original_url=image_url)
+            es_query = Search().index(settings.ES_INDEX_NAME).using(client=es).query("match", original_url=image_url)
             response = es_query.execute()
 
             # @TODO: add tags for exising images (by hash)
-            if check_indexed_url(image_url, IndexedMediaTable) or response.success() and len(response.hits) != 0:
+            if is_url_indexed(image_url, IndexedMediaTable) or response.success() and len(response.hits) != 0:
                 continue
 
             # downloading file
@@ -38,15 +37,15 @@ class MemePipeline(object):
                 sha256_hash = hashlib.sha256(http_request.content).hexdigest()
 
                 # checking if www and www/static exists
-                if not os.path.exists(bot_settings.STATIC_LOCAL_FOLDER):
-                    os.makedirs(bot_settings.STATIC_LOCAL_FOLDER, exist_ok=True)
+                if not os.path.exists(settings.STATIC_LOCAL_FOLDER):
+                    os.makedirs(settings.STATIC_LOCAL_FOLDER, exist_ok=True)
 
                 # saving image
                 file_ext = mimetypes.guess_extension(http_request.headers['content-type'])
-                image_folder = os.path.join(bot_settings.STATIC_LOCAL_FOLDER, sha256_hash)
+                image_folder = os.path.join(settings.STATIC_LOCAL_FOLDER, sha256_hash)
                 os.mkdir(image_folder)
 
-                image_filename = bot_settings.DEFAULT_IMAGE_FILENAME + file_ext
+                image_filename = settings.DEFAULT_IMAGE_FILENAME + file_ext
                 image_full_path = os.path.join(image_folder, image_filename)
 
                 with open(image_full_path, "wb") as output_image:
@@ -54,14 +53,17 @@ class MemePipeline(object):
 
                 # generating thumbnail
                 thumb = Image.open(image_full_path)
-                thumb_size = ((thumb.width * bot_settings.THUMBNAILS_HEIGHT / thumb.height), bot_settings.THUMBNAILS_HEIGHT)
+                thumb_size = ((thumb.width * settings.THUMBNAILS_HEIGHT / thumb.height), settings.THUMBNAILS_HEIGHT)
                 thumb.thumbnail(thumb_size)
-                thumb.save(os.path.join(image_folder, bot_settings.THUMBNAIL_PREFIX + image_filename))
+                thumb.save(os.path.join(image_folder, settings.THUMBNAIL_PREFIX + image_filename))
 
                 # adding image to ES
-                MemeImporter(es, index_name=bot_settings.ES_INDEX_NAME, doc_name=bot_settings.ES_DOC_TYPE).insert(
+                MemeImporter(es, index_name=settings.ES_INDEX_NAME, doc_name=settings.ES_DOC_TYPE).insert(
                     image_id=sha256_hash,
                     tags=item['tags'],
+                    alt_tags=item['alt_tags'],
+                    description=item['description'],
+                    meaning=item['meaning'],
                     file_name=image_filename,
                     article_url=item['url'],
                     original_url=image_url
@@ -70,7 +72,8 @@ class MemePipeline(object):
                 # save data to DB
                 media_row = IndexedMediaTable(url=image_url, id=sha256_hash, hash=sha256_hash,
                                               file_name=image_filename, tags=json.dumps(item['tags']),
-                                              article_url=item['url'])
+                                              alt_tags=item['alt_tags'], description=item['description'],
+                                              meaning=json.dumps(item['meaning']), article_url=item['url'])
                 db_session.add(media_row)
                 db_session.commit()
 

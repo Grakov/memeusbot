@@ -6,6 +6,10 @@ from crawler.spider_db import *
 
 # selectors
 MEMEPEDIA_BASIC_SELECTOR = 'article div.single-main-container div.col-content div.s-post-content img'
+MEMEPEDIA_CONTENT_SELECTOR = 'article div.single-main-container div.col-content div.s-post-content'
+MEMEPEDIA_ALT_TAGS_SELECTOR = 'p b,p strong'
+MEMEPEDIA_PARAGRAPH_SELECTOR = 'p, h2'
+MEMEPEDIA_IMG_DESCRIPTIONS_SELECTOR = 'p em'
 MEMEPEDIA_CATEGORY_SELECTOR = 'article nav ol li.ordinal-item span'
 MEMEPEDIA_PREVIEW_SELECTOR = 'article div.single-main-container div.col-content figure.post-thumbnail img'
 MEMEPEDIA_TITLE_SELECTOR = 'title'
@@ -17,7 +21,14 @@ MEMEPEDIA_EXCLUDES = [
 ]
 MEMEPEDIA_URL_EXCLUDES = [
     'wp-login',
-    'tel:'
+    '/users/',
+    'tel:',
+]
+MEMEPEDIA_CACHE_EXCLUDES = [
+    '/page/'
+]
+MEMEPEDIA_TAG_EXCLUDES = [
+    'Ctrl+Enter'
 ]
 MEMEPEDIA_SUITABLE_CATEGORIES = {
     'Мемы': 'meme',
@@ -41,9 +52,14 @@ class MemeSpider(scrapy.Spider):
 
     def parse(self, response):
         tags = set()
+        alt_tags = ''
         pictures = set()
         category = None
-        if not response.headers['content-type'].decode("utf-8").split(';')[0].lower() in MEMEPEDIA_ACCEPTED_CONTENT_TYPES:
+        description = ''
+        meaning = list()
+
+        if not response.headers['content-type'].decode("utf-8").split(';')[
+                   0].lower() in MEMEPEDIA_ACCEPTED_CONTENT_TYPES:
             return
 
         # get type of material
@@ -68,17 +84,46 @@ class MemeSpider(scrapy.Spider):
                 if p_src is not None:
                     pictures.add(p_src)
 
+            article_content = response.css(MEMEPEDIA_CONTENT_SELECTOR)
+
+            # @TODO should I replace \xa0 with ' '?
+            # get alt tags and description
+            alt_tags_element = article_content.css(MEMEPEDIA_ALT_TAGS_SELECTOR)
+            if len(alt_tags_element) > 0:
+                alt_tags = ''.join(alt_tags_element[0].css('::text').getall()).strip()
+                description = ''.join(article_content.css(MEMEPEDIA_PARAGRAPH_SELECTOR)[0].css('p::text').getall()).strip()
+
+            # get meme meaning
+            meaning_header_found = False
+            for paragraph in article_content.css(MEMEPEDIA_PARAGRAPH_SELECTOR):
+                header_check = paragraph.css('h2')
+
+                if len(header_check) > 0:
+                    if meaning_header_found:
+                        break
+
+                    if header_check.css('::text').get().strip() == 'Значение':
+                        meaning_header_found = True
+                else:
+                    if meaning_header_found:
+                        meaning.append(''.join(paragraph.css('::text').getall()).strip())
+
             # parse pictures
-            # @TODO change list to set for tags (like on pictures)
             for item in response.css(MEMEPEDIA_BASIC_SELECTOR):
                 src = item.attrib.get('src', None)
                 tag = item.attrib.get('alt', None)
 
-                if src is None or src in MEMEPEDIA_EXCLUDES:
+                if src is None or src == '' or src in MEMEPEDIA_EXCLUDES:
                     continue
                 pictures.add(src)
 
-                if tag is not None:
+                if tag is not None and len(tag) > 0 and tag not in MEMEPEDIA_TAG_EXCLUDES:
+                    tags.add(tag)
+
+            # parse notes for images
+            for img_description in article_content.css(MEMEPEDIA_IMG_DESCRIPTIONS_SELECTOR):
+                tag = img_description.css('::text').get().strip()
+                if len(tag) > 0 and tag not in MEMEPEDIA_TAG_EXCLUDES:
                     tags.add(tag)
 
             # parse galleries
@@ -88,11 +133,13 @@ class MemeSpider(scrapy.Spider):
                     pictures.add(src.strip())
 
             if len(tags) > 0:
-                yield MemeArticle(url=response.url, images=list(pictures), tags=list(tags))
+                yield MemeArticle(url=response.url, images=list(pictures), tags=list(tags), alt_tags=alt_tags,
+                                  description=description, meaning=meaning)
 
         # save data to DB
-        if not check_indexed_url(response.url, IndexedPagesTable):
-            page_row = IndexedPagesTable(url=response.url, tags=json.dumps(list(tags)), media=json.dumps(list(pictures)))
+        if not is_url_indexed(response.url, IndexedPagesTable) and self.is_url_cacheable(response.url):
+            page_row = IndexedPagesTable(url=response.url, tags=json.dumps(list(tags)), alt_tags=alt_tags,
+                                         media=json.dumps(list(pictures)))
             db_session.add(page_row)
             db_session.commit()
 
@@ -100,11 +147,21 @@ class MemeSpider(scrapy.Spider):
         for next_page in response.css('a'):
             url = next_page.attrib.get('href', None)
             if url is not None:
-                if (not check_indexed_url(url, IndexedPagesTable) and self.is_allowed_url(url)) or url in self.start_urls:
+                if (not is_url_indexed(url, IndexedPagesTable) and self.is_url_allowed(url)) or url in self.start_urls:
                     yield response.follow(url, self.parse)
 
-    def is_allowed_url(self, url):
+    def is_url_allowed(self, url):
         for rule in MEMEPEDIA_URL_EXCLUDES:
             if url.find(rule) != -1:
                 return False
+        return True
+
+    def is_url_cacheable(self, url):
+        for rule in MEMEPEDIA_CACHE_EXCLUDES:
+            if url.find(rule) != -1:
+                return False
+
+        if url in self.start_urls:
+            return False
+
         return True

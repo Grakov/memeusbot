@@ -9,11 +9,13 @@ Made with [pyTelegramBotAPI](https://github.com/eternnoir/pyTelegramBotAPI), [El
 * Create [virtual environment](https://docs.python.org/3/tutorial/venv.html).
 * Install via ``pip`` packages listed in ``requirements.txt``.
 * If you don't already have a Telegram bot, [create](https://core.telegram.org/bots#6-botfather) one and obtain authorization token.
-* Make a copy of file ``bot/settings_example.py`` and save it to ``bot/settings.py``. Paste your Telegram bot's token here: 
+* Paste your Telegram bot's token in ``bot/.env`` file: 
 
 ```
-BOT_TOKEN = "TOKEN:GOES_HERE"
+BOT_TOKEN="TOKEN:GOES_HERE"
 ```
+
+Bot and crawler (except Scrapy) settings are available in ``bot/settings.py`` and ``crawler/crawler_settings.py``.
 
 Replace ``example.com`` with your domain:
 
@@ -52,11 +54,13 @@ python bot\main.py
 ## Project structure
 ```
 +--- bot                    # bot directory
+|   +--- .env
 |   +--- main.py            # Main bot script
-|   +--- settings.py        # Project's settings file
-|   +--- settings_example.py
-|   +--- __init__.py
+|   +--- search.py          # Searching in memeus ES index
+|   +--- settings.py        # Bot's settings
 +--- crawler                # Scrapy crawler directory
+|   +--- crawler_settings.py # Crawler settings 
+|   +--- importer.py        # Importing data to memeus ES index
 |   +--- items.py 
 |   +--- models.py          # DB tables models
 |   +--- pipelines.py       # Saving scrapped data
@@ -64,10 +68,6 @@ python bot\main.py
 |   +--- spiders
 |   |   +--- memepedia.py   # Spider for memepedia.ru
 |   +--- spider_db.py       # DB config
-|--- es_meme                # Tools for working with ES
-|   +--- importer.py        # Importing data to memeus ES index
-|   +--- search.py          # Searching in memeus ES index
-|   +--- __init.py__
 +--- scrapy.cfg             # Scrapy cfg-file
 +--- www                    # HTTP root
 |   +--- index.html
