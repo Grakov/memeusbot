@@ -1,3 +1,4 @@
+import sys
 import logging
 import random
 
@@ -116,6 +117,8 @@ def process_query(inline_query):
 while True:
     try:
         bot.polling()
+    except KeyboardInterrupt:
+        sys.exit()
     except telebot.apihelper.ApiTelegramException as e:
         bot.stop_polling()
         print(e)
