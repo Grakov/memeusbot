@@ -50,11 +50,13 @@ def query_test(message):
                 bot.send_message(message.chat.id, response_text, parse_mode="Markdown",
                                  reply_to_message_id=message.message_id)
             else:
+                if len(response) > 20:
+                    response = response[0:20]
                 hit = random.choice(response)
                 if settings.IS_SERVERLESS:
                     photo_url = hit.original_url
                 else:
-                    photo_url = construct_url(hit.file_id, hit.file_name)
+                    photo_url = construct_url(hit.id, hit.file_name)
 
                 bot.send_photo(message.chat.id, photo_url, reply_to_message_id=message.message_id)
 
@@ -114,5 +116,6 @@ def process_query(inline_query):
 while True:
     try:
         bot.polling()
-    except Exception as e:
+    except telebot.apihelper.ApiTelegramException as e:
+        bot.stop_polling()
         print(e)
