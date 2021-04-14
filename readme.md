@@ -51,6 +51,10 @@ python bot/main.py
 python bot\main.py
 ```
 
+## Known issues
+
+Unfortunately on Telegram for Windows search results aren't displayed with bot setting ``IS_SERVERLESS = False``.
+
 ## Project structure
 ```
 +--- bot                    # bot directory

@@ -27,7 +27,7 @@ class MemePipeline(object):
             es_query = Search().index(settings.ES_INDEX_NAME).using(client=es).query("match", original_url=image_url)
             response = es_query.execute()
 
-            # @TODO: add tags for exising images (by hash)
+            # @TODO: add tags for existing images (by hash)
             if is_url_indexed(image_url, IndexedMediaTable) or response.success() and len(response.hits) != 0:
                 continue
 

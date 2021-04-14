@@ -21,7 +21,9 @@ sad_emojis = ['😔', '👀', '🕵️‍♂️', '🦸‍♂️', '🎲', '🔎
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    bot.send_message(message.chat.id, str(message))
+    bot.send_message(message.chat.id, f"Hi, user!\n\n" +
+                     "You can search memes here - I'll give you one random meme for your request.\n\n" +
+                     "Or you can type @memeusbot and search for memes without limits on any chat!")
 
 
 @bot.message_handler(func=lambda m: True)
@@ -32,16 +34,29 @@ def query_test(message):
     else:
         response = MemeSearch(es, index_name=settings.ES_INDEX_NAME, query_text=query,
                               max_results=settings.RESULTS_LIMIT).execute()
-        response_text = f'*Results (total: {len(response)})*\n\n'
-        result_number = 1
-        for result in response:
-            if result_number > 20:
-                break
-            response_text += f"{str(result_number)} _({result.meta.score})_: [{result.original_url}](Image)\n"
-            response_text += f"{result.article_url}\n\n"
-            result_number += 1
+        if len(response) == 0:
+            bot.reply_to(message, '👀 No results')
+        else:
+            if settings.DEBUG:
+                response_text = f'*Results (total: {len(response)})*\n\n'
+                result_number = 1
+                for result in response:
+                    if result_number > 20:
+                        break
+                    response_text += f"{str(result_number)} _({result.meta.score})_: [{result.original_url}](Image)\n"
+                    response_text += f"{result.article_url}\n\n"
+                    result_number += 1
 
-        bot.send_message(message.chat.id, response_text, parse_mode="Markdown")
+                bot.send_message(message.chat.id, response_text, parse_mode="Markdown",
+                                 reply_to_message_id=message.message_id)
+            else:
+                hit = random.choice(response)
+                if settings.IS_SERVERLESS:
+                    photo_url = hit.original_url
+                else:
+                    photo_url = construct_url(hit.file_id, hit.file_name)
+
+                bot.send_photo(message.chat.id, photo_url, reply_to_message_id=message.message_id)
 
 
 @bot.inline_handler(lambda query: len(query.query.strip()) > 2)
@@ -96,4 +111,8 @@ def process_query(inline_query):
         print(e)
 
 
-bot.polling()
+while True:
+    try:
+        bot.polling()
+    except Exception as e:
+        print(e)

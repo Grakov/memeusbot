@@ -23,6 +23,8 @@ MEMEPEDIA_URL_EXCLUDES = [
     'wp-login',
     '/users/',
     'tel:',
+    'mailto:',
+    'shop.memepedia.ru'
 ]
 MEMEPEDIA_CACHE_EXCLUDES = [
     '/page/'
@@ -143,7 +145,6 @@ class MemeSpider(scrapy.Spider):
             db_session.add(page_row)
             db_session.commit()
 
-        # @TODO add exception for urls with '/page/'
         for next_page in response.css('a'):
             url = next_page.attrib.get('href', None)
             if url is not None:

@@ -23,7 +23,6 @@ class MemeSearch:
         if self.response.success():
             return [hit for hit in self.response]
         else:
-            # @TODO: replace return with throw?
             return []
 
     def es_response(self):

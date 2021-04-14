@@ -10,6 +10,5 @@ Session = sessionmaker(bind=engine)
 db_session = Session()
 
 
-# @TODO add check for visited, but not indexed page (empty tags)
 def is_url_indexed(url, table):
     return len(db_session.query(table).filter(table.url == url).all()) > 0
