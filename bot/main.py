@@ -24,7 +24,7 @@ sad_emojis = ['😔', '👀', '🕵️‍♂️', '🦸‍♂️', '🎲', '🔎
 def start(message):
     bot.send_message(message.chat.id, f"Hi, user!\n\n" +
                      "You can search memes here - I'll give you one random meme for your request.\n\n" +
-                     "Or you can type @memeusbot and search for memes without limits on any chat!")
+                     "Or you can type @memeusbot and search for memes without limits in any chat!")
 
 
 @bot.message_handler(func=lambda m: True)
