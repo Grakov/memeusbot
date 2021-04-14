@@ -3,7 +3,7 @@ import sys
 
 from dotenv import load_dotenv
 
-if len(os.environ) == 0:
+if os.environ.get('BOT_TOKEN', None) is None:
     load_dotenv()
 
 BOT_TOKEN = os.environ.get('BOT_TOKEN', 'DO_NOT_PASTE_TOKEN_HERE')
