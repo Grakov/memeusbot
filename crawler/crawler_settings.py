@@ -14,7 +14,7 @@ DEFAULT_IMAGE_FILENAME = "image"
 THUMBNAILS_HEIGHT = 200
 THUMBNAIL_PREFIX = "thumb_"
 
-ES_HOST = "localhost"
+ES_HOST = os.environ.get('ES_HOST', "localhost")
 ES_PORT = 9200
 ES_INDEX_NAME = "memeus"
 ES_DOC_TYPE = "_doc"

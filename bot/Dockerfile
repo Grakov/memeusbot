@@ -10,9 +10,10 @@ COPY requirements.txt /tmp/requirements.txt
 RUN pip3 install wheel && \
     pip3 install -r /tmp/requirements.txt
 
+RUN useradd -m memeusbot
+RUN mkdir -p /var/www/memeusbot ; chown -R memeusbot:memeusbot /var/www/memeusbot
 VOLUME /var/www/memeusbot
 
-RUN useradd -m memeusbot
 ENV HOME="/home/memeusbot"
 COPY . $HOME/memeusbot
 RUN chown -R memeusbot:memeusbot $HOME/memeusbot

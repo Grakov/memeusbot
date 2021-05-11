@@ -18,6 +18,7 @@ services:
       - bot_file_storage:/var/www/memeusbot
     environment:
       - TZ=Europe/Moscow
+      - ES_HOST=memeusbot_elastic
 
   memeusbot_crawler:
     build: crawler/
@@ -26,6 +27,7 @@ services:
       - bot_file_storage:/var/www/memeusbot
     environment:
       - TZ=Europe/Moscow
+      - ES_HOST=memeusbot_elastic
 
   memeusbot_nginx:
     build: nginx/
