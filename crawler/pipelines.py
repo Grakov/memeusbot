@@ -40,9 +40,10 @@ class MemePipeline(object):
                 # checking if www and www/static exists
                 if not os.path.exists(settings.STATIC_LOCAL_FOLDER):
                     os.makedirs(settings.STATIC_LOCAL_FOLDER, exist_ok=True)
-                if not os.path.exists(os.path.join(settings.WWW_LOCAL_FOLDER, 'index.html')):
-                    settings.shutil.copyfile(os.path.join(settings.BASE_DIR, 'www', 'index.html'),
-                                             os.path.join(settings.WWW_LOCAL_FOLDER, 'index.html'))
+
+                index_html_path = os.path.join(settings.WWW_LOCAL_FOLDER, 'index.html')
+                if not os.path.exists(index_html_path):
+                    settings.shutil.copyfile(os.path.join(settings.BASE_DIR, 'www', 'index.html'), index_html_path)
 
                 # saving image
                 file_ext = mimetypes.guess_extension(http_request.headers['content-type'])

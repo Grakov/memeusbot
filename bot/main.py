@@ -17,10 +17,6 @@ bot = telebot.TeleBot(settings.BOT_TOKEN, parse_mode=None)
 if settings.DEBUG:
     telebot.logger.setLevel(logging.DEBUG)
 
-index_html_path = os.path.join(settings.STATIC_LOCAL_FOLDER, 'index.html')
-if not os.path.exists(index_html_path):
-    shutil.copy2(os.path.join('../crawler/www', 'index.html'), index_html_path)
-
 es = Elasticsearch([{'host': settings.ES_HOST, 'port': settings.ES_PORT}])
 
 sad_emojis = ['😔', '👀', '🕵️‍♂️', '🦸‍♂️', '🎲', '🔎', '😿', '🪂', '🌠', '☂', '💔', '❌']
