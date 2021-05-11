@@ -43,7 +43,7 @@ class MemePipeline(object):
 
                 index_html_path = os.path.join(settings.WWW_LOCAL_FOLDER, 'index.html')
                 if not os.path.exists(index_html_path):
-                    settings.shutil.copyfile(os.path.join(settings.BASE_DIR, 'www', 'index.html'), index_html_path)
+                    shutil.copyfile(os.path.join(settings.BASE_DIR, 'www', 'index.html'), index_html_path)
 
                 # saving image
                 file_ext = mimetypes.guess_extension(http_request.headers['content-type'])

@@ -18,7 +18,4 @@ ENV HOME="/home/memeusbot"
 COPY . $HOME/memeusbot
 WORKDIR $HOME/memeusbot
 
-RUN pip3 install wheel && \
-    pip3 install -r requirements.txt
-
 ENTRYPOINT ["python", "main.py"]

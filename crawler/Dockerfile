@@ -14,9 +14,9 @@ VOLUME /var/www/memeusbot
 RUN useradd -m memeusbot
 USER memeusbot
 ENV HOME="/home/memeusbot"
-ENV PATH="${HOME}/.local/bin:${PATH}"
 
 COPY . $HOME/crawler
+RUN cp $HOME/crawler/scrapy.cfg.template $HOME/scrapy.cfg
 WORKDIR $HOME
 
 ENTRYPOINT ["scrapy", "crawl", "memepedia"]

@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from crawler.models import Base, IndexedPagesTable, IndexedMediaTable
-import crawler_settings as settings
+import crawler.crawler_settings as settings
 
 engine = create_engine('sqlite:///' + os.path.join(settings.LOCAL_FOLDER, 'crawler_data.db'))
 Base.metadata.create_all(engine)

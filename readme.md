@@ -72,7 +72,7 @@ docker container run -d --name memeusbot_bot -v bot_storage:/var/www/memeusbot m
 ### Crawler
 Make Docker image via ``Dockerfile`` and run container based on it:
 ```
-docker image build -t memeusbot_crawler crawler/ 
+docker image build -t memeusbot_crawler crawler/
 docker container run -d --name memeusbot_crawler -v bot_storage:/var/www/memeusbot memeusbot_crawler
 ```
 
@@ -80,7 +80,7 @@ docker container run -d --name memeusbot_crawler -v bot_storage:/var/www/memeusb
 Make Docker image via ``Dockerfile`` and run container based on it:
 ```
 docker image build -t memeusbot_elastic elasticsearch/
-docker container run -d --name memeusbot_elastic -p 127.0.0.1:9200:9200 memeusbot_elastic
+docker container run -d --name memeusbot_elastic -p 127.0.0.1:9200:9200 -e 'discovery.type=single-node' memeusbot_elastic
 ```
 
 ### Nginx
