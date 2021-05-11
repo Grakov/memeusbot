@@ -8,6 +8,12 @@ services:
   memeusbot_bot:
     build: bot/
     container_name: memeusbot_bot
+    restart: unless-stopped
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        window: 60s
     volumes:
       - bot_file_storage:/var/www/memeusbot
     environment:
@@ -24,6 +30,12 @@ services:
   memeusbot_nginx:
     build: nginx/
     container_name: memeusbot_nginx
+    restart: unless-stopped
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        window: 60s
     ports:
       - 127.0.0.1:8081:80
     volumes:
@@ -34,6 +46,12 @@ services:
   elasticsearch:
     build: elasticsearch/
     container_name: memeusbot_elastic
+    restart: unless-stopped
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        window: 120s
     ports:
       - 127.0.0.1:9200:9200
     ulimits:
@@ -44,4 +62,5 @@ services:
       - bot_elastic_storage:/usr/share/elasticsearch/data
     environment:
       - TZ=Europe/Moscow
+      - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"

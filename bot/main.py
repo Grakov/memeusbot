@@ -11,7 +11,7 @@ from telebot import types
 import settings
 from settings import construct_url
 
-from bot.search import MemeSearch
+from search import MemeSearch
 
 bot = telebot.TeleBot(settings.BOT_TOKEN, parse_mode=None)
 if settings.DEBUG:

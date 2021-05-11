@@ -5,15 +5,18 @@ RUN apt-get update && apt-get install -y \
     python-is-python3 \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt /tmp/requirements.txt
+RUN pip3 install wheel && \
+    pip3 install -r /tmp/requirements.txt
+
 VOLUME /var/www/memeusbot
 RUN useradd -m memeusbot
 USER memeusbot
+ENV HOME="/home/memeusbot"
+ENV PATH="${HOME}/.local/bin:${PATH}"
 
 COPY . $HOME/crawler
-COPY requirements.txt $HOME/requirements.txt
-
 WORKDIR $HOME
-RUN pip3 install wheel && \
-    pip3 install -r requirements.txt
 
-ENTRYPOINT ['scrapy', 'crawl', 'memepedia']
+ENTRYPOINT ["scrapy", "crawl", "memepedia"]

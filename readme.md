@@ -65,17 +65,22 @@ docker volume create bot_storage
 ### Bot
 Make Docker image via ``Dockerfile`` and run container based on it:
 ```
-cd bot
-docker image build -t memeusbot_bot -f Dockerfile . 
+docker image build -t memeusbot_bot bot/
 docker container run -d --name memeusbot_bot -v bot_storage:/var/www/memeusbot memeusbot_bot
 ```
 
 ### Crawler
 Make Docker image via ``Dockerfile`` and run container based on it:
 ```
-cd crawler
-docker image build -t memeusbot_crawler -f Dockerfile . 
+docker image build -t memeusbot_crawler crawler/ 
 docker container run -d --name memeusbot_crawler -v bot_storage:/var/www/memeusbot memeusbot_crawler
+```
+
+### Elasticsearch
+Make Docker image via ``Dockerfile`` and run container based on it:
+```
+docker image build -t memeusbot_elastic elasticsearch/
+docker container run -d --name memeusbot_elastic -p 127.0.0.1:9200:9200 memeusbot_elastic
 ```
 
 ### Nginx
@@ -84,9 +89,8 @@ By default it's configured to be used as ``proxy_pass`` backend. So nginx on you
 
 Make Docker image via ``Dockerfile`` and run container based on it:
 ```
-cd nginx
-docker image build -t memeusbot_nginx -f Dockerfile . 
-docker container run -d --name memeusbot_nginx -v bot_storage:/var/www/memeusbot -p 127.0.0.1:8080:80 memeusbot_nginx
+docker image build -t memeusbot_nginx nginx/
+docker container run -d --name memeusbot_nginx -v bot_storage:/var/www/memeusbot -p 127.0.0.1:8081:80 memeusbot_nginx
 ```
 
 ## Known issues

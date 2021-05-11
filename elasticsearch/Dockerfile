@@ -6,4 +6,6 @@ EXPOSE 9200
 RUN mkdir -p /etc/elasticsearch/hunspell/ru_RU
 COPY ru_RU.* /etc/elasticsearch/hunspell/ru_RU/
 
+USER elasticsearch:root
+
 ENTRYPOINT ["elasticsearch"]
