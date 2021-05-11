@@ -12,11 +12,10 @@ RUN pip3 install wheel && \
 
 VOLUME /var/www/memeusbot
 
+RUN useradd -m memeusbot
 ENV HOME="/home/memeusbot"
 COPY . $HOME/memeusbot
-
-RUN useradd -m memeusbot
-RUN chown -R memeusbot:memeusbot crawler
+RUN chown -R memeusbot:memeusbot $HOME/memeusbot
 
 USER memeusbot
 WORKDIR $HOME/memeusbot

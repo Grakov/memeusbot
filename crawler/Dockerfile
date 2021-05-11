@@ -12,12 +12,11 @@ RUN pip3 install wheel && \
 
 VOLUME /var/www/memeusbot
 
+RUN useradd -m memeusbot
 ENV HOME="/home/memeusbot"
 COPY . $HOME/crawler
-RUN cp $HOME/crawler/scrapy.cfg.template $HOME/scrapy.cfg
-
-RUN useradd -m memeusbot
-RUN chown -R memeusbot:memeusbot crawler
+RUN mv $HOME/crawler/scrapy.cfg $HOME/scrapy.cfg
+RUN chown -R memeusbot:memeusbot $HOME/crawler
 
 USER memeusbot
 WORKDIR $HOME
