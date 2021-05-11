@@ -1,6 +1,7 @@
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
 
+import shutil
 import requests
 import mimetypes
 import os
@@ -39,6 +40,9 @@ class MemePipeline(object):
                 # checking if www and www/static exists
                 if not os.path.exists(settings.STATIC_LOCAL_FOLDER):
                     os.makedirs(settings.STATIC_LOCAL_FOLDER, exist_ok=True)
+                if not os.path.exists(os.path.join(settings.WWW_LOCAL_FOLDER, 'index.html')):
+                    settings.shutil.copyfile(os.path.join(settings.BASE_DIR, 'www', 'index.html'),
+                                             os.path.join(settings.WWW_LOCAL_FOLDER, 'index.html'))
 
                 # saving image
                 file_ext = mimetypes.guess_extension(http_request.headers['content-type'])

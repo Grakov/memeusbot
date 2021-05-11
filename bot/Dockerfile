@@ -10,13 +10,10 @@ RUN useradd -m memeusbot
 USER memeusbot
 
 COPY . $HOME/memeusbot
-COPY ../requirements.txt $HOME/requirements.txt
-COPY ../www $HOME/www
-
-WORKDIR $HOME
-RUN pip3 install wheel && \
-    pip3 install -r requirements.txt
 
 WORKDIR $HOME/memeusbot
+
+RUN pip3 install wheel && \
+    pip3 install -r requirements.txt
 
 ENTRYPOINT ['python', 'bot.py']

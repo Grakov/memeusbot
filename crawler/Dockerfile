@@ -10,7 +10,7 @@ RUN useradd -m memeusbot
 USER memeusbot
 
 COPY . $HOME/crawler
-COPY ../requirements.txt $HOME/requirements.txt
+COPY requirements.txt $HOME/requirements.txt
 
 WORKDIR $HOME
 RUN pip3 install wheel && \

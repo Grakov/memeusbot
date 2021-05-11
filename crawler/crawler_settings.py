@@ -8,7 +8,8 @@ TMP_DIR = os.path.join(BASE_DIR, 'tmp')
 sys.path.insert(0, BASE_DIR)
 
 LOCAL_FOLDER = os.path.join(os.sep, 'var', 'www', 'memeusbot')
-STATIC_LOCAL_FOLDER = os.path.join(LOCAL_FOLDER, 'www')
+WWW_LOCAL_FOLDER = os.path.join(LOCAL_FOLDER, 'www')
+STATIC_LOCAL_FOLDER = os.path.join(WWW_LOCAL_FOLDER, 'static')
 DEFAULT_IMAGE_FILENAME = "image"
 THUMBNAILS_HEIGHT = 200
 THUMBNAIL_PREFIX = "thumb_"
