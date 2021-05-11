@@ -11,11 +11,14 @@ RUN pip3 install wheel && \
     pip3 install -r /tmp/requirements.txt
 
 VOLUME /var/www/memeusbot
-RUN useradd -m memeusbot
-USER memeusbot
-ENV HOME="/home/memeusbot"
 
+ENV HOME="/home/memeusbot"
 COPY . $HOME/memeusbot
+
+RUN useradd -m memeusbot
+RUN chown -R memeusbot:memeusbot crawler
+
+USER memeusbot
 WORKDIR $HOME/memeusbot
 
 ENTRYPOINT ["python", "main.py"]

@@ -11,12 +11,15 @@ RUN pip3 install wheel && \
     pip3 install -r /tmp/requirements.txt
 
 VOLUME /var/www/memeusbot
-RUN useradd -m memeusbot
-USER memeusbot
-ENV HOME="/home/memeusbot"
 
+ENV HOME="/home/memeusbot"
 COPY . $HOME/crawler
 RUN cp $HOME/crawler/scrapy.cfg.template $HOME/scrapy.cfg
+
+RUN useradd -m memeusbot
+RUN chown -R memeusbot:memeusbot crawler
+
+USER memeusbot
 WORKDIR $HOME
 
 ENTRYPOINT ["scrapy", "crawl", "memepedia"]
