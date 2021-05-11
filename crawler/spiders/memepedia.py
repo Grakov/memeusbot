@@ -104,7 +104,8 @@ class MemeSpider(scrapy.Spider):
                     if meaning_header_found:
                         break
 
-                    if header_check.css('::text').get().strip() == 'Значение':
+                    if header_check.css('::text').get() is not None and \
+                            header_check.css('::text').get().strip() == 'Значение':
                         meaning_header_found = True
                 else:
                     if meaning_header_found:
@@ -124,9 +125,11 @@ class MemeSpider(scrapy.Spider):
 
             # parse notes for images
             for img_description in article_content.css(MEMEPEDIA_IMG_DESCRIPTIONS_SELECTOR):
-                tag = img_description.css('::text').get().strip()
-                if len(tag) > 0 and tag not in MEMEPEDIA_TAG_EXCLUDES:
-                    tags.add(tag)
+                tag = img_description.css('::text').get()
+                if tag is not None:
+                    tag = tag.strip()
+                    if len(tag) > 0 and tag not in MEMEPEDIA_TAG_EXCLUDES:
+                        tags.add(tag)
 
             # parse galleries
             for item in response.css(MEMEPEDIA_GALLERY_SELECTOR):

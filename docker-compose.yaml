@@ -1,0 +1,47 @@
+version: "3"
+
+volumes:
+  bot_file_storage:
+  bot_elastic_storage:
+
+services:
+  memeusbot_bot:
+    build: bot/
+    container_name: memeusbot_bot
+    volumes:
+      - bot_file_storage:/var/www/memeusbot
+    environment:
+      - TZ=Europe/Moscow
+
+  memeusbot_crawler:
+    build: crawler/
+    container_name: memeusbot_crawler
+    volumes:
+      - bot_file_storage:/var/www/memeusbot
+    environment:
+      - TZ=Europe/Moscow
+
+  memeusbot_nginx:
+    build: nginx/
+    container_name: memeusbot_nginx
+    ports:
+      - 127.0.0.1:8081:80
+    volumes:
+      - bot_file_storage:/var/www/memeusbot
+    environment:
+      - TZ=Europe/Moscow
+
+  elasticsearch:
+    build: elasticsearch/
+    container_name: memeusbot_elastic
+    ports:
+      - 127.0.0.1:9200:9200
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - bot_elastic_storage:/usr/share/elasticsearch/data
+    environment:
+      - TZ=Europe/Moscow
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"

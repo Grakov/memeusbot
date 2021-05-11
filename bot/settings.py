@@ -20,10 +20,11 @@ TMP_DIR = os.path.join(BASE_DIR, 'tmp')
 # RESULTS_LIMIT should be int
 RESULTS_LIMIT = 50
 
+LOCAL_FOLDER = os.path.join(os.sep, 'var', 'www', 'memeusbot')
 STATIC_PROTO = "https://"
 STATIC_DOMAIN = "memeus.sychusha.com"
 STATIC_BASE_URL = "/static/"
-STATIC_LOCAL_FOLDER = os.path.join(BASE_DIR, 'www', 'static')
+STATIC_LOCAL_FOLDER = os.path.join(LOCAL_FOLDER, 'www')
 DEFAULT_IMAGE_FILENAME = "image"
 THUMBNAILS_HEIGHT = 200
 THUMBNAIL_PREFIX = "thumb_"

@@ -14,6 +14,7 @@ Made with [pyTelegramBotAPI](https://github.com/eternnoir/pyTelegramBotAPI), [El
 ```
 BOT_TOKEN="TOKEN:GOES_HERE"
 ```
+Alternatively you can paste it in ``docker-compose.yaml`` in ``environment`` section for bot service (Docker only).
 
 Bot and crawler (except Scrapy) settings are available in ``bot/settings.py`` and ``crawler/crawler_settings.py``.
 
@@ -51,6 +52,43 @@ python bot/main.py
 python bot\main.py
 ```
 
+## Docker
+You can use Dockerfiles from this project for running Memeusbot project in Docker.
+Dockerfiles are available separately for all instances: bot, crawler and nginx for serving static files
+
+Before running any container, you should create docker volume (in these examples named ``bot_storage``).
+It will be mounted on every container to ``/var/www/memeusbot``:
+```
+docker volume create bot_storage
+```
+
+### Bot
+Make Docker image via ``Dockerfile`` and run container based on it:
+```
+cd bot
+docker image build -t memeusbot_bot -f Dockerfile . 
+docker container run -d --name memeusbot_bot -v bot_storage:/var/www/memeusbot memeusbot_bot
+```
+
+### Crawler
+Make Docker image via ``Dockerfile`` and run container based on it:
+```
+cd crawler
+docker image build -t memeusbot_crawler -f Dockerfile . 
+docker container run -d --name memeusbot_crawler -v bot_storage:/var/www/memeusbot memeusbot_crawler
+```
+
+### Nginx
+Nginx is optional and needed only if you want to serve images from your server. 
+By default it's configured to be used as ``proxy_pass`` backend. So nginx on your host is required.
+
+Make Docker image via ``Dockerfile`` and run container based on it:
+```
+cd nginx
+docker image build -t memeusbot_nginx -f Dockerfile . 
+docker container run -d --name memeusbot_nginx -v bot_storage:/var/www/memeusbot -p 127.0.0.1:8080:80 memeusbot_nginx
+```
+
 ## Known issues
 
 Unfortunately on Telegram for Windows search results aren't displayed with bot setting ``IS_SERVERLESS = False``.
@@ -72,8 +110,12 @@ Unfortunately on Telegram for Windows search results aren't displayed with bot s
 |   +--- spiders
 |   |   +--- memepedia.py   # Spider for memepedia.ru
 |   +--- spider_db.py       # DB config
-+--- scrapy.cfg             # Scrapy cfg-file
++--- elasticsearch          # Dockerfile and configs for dockered Elasticsearch
++--- nginx                  # Dockerfile and configs for dockered nginx
 +--- www                    # HTTP root
 |   +--- index.html
 |   +--- static             # Downloaded images directory
++--- docker-compose.yaml    # Docker-compose config file
++--- requirements.txt       # Python pip requirements
++--- scrapy.cfg             # Scrapy cfg-file
 ```

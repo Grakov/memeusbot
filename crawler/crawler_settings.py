@@ -7,7 +7,8 @@ TMP_DIR = os.path.join(BASE_DIR, 'tmp')
 # workaround for crawler ModuleNotFoundError: No module named ...
 sys.path.insert(0, BASE_DIR)
 
-STATIC_LOCAL_FOLDER = os.path.join(BASE_DIR, 'www', 'static')
+LOCAL_FOLDER = os.path.join(os.sep, 'var', 'www', 'memeusbot')
+STATIC_LOCAL_FOLDER = os.path.join(LOCAL_FOLDER, 'www')
 DEFAULT_IMAGE_FILENAME = "image"
 THUMBNAILS_HEIGHT = 200
 THUMBNAIL_PREFIX = "thumb_"
