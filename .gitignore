@@ -2,5 +2,4 @@
 __pycache__
 .env
 venv
-/crawler/www/static
 /crawler_data.db

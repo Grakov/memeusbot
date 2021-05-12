@@ -89,6 +89,7 @@ class MemeSpider(scrapy.Spider):
             article_content = response.css(MEMEPEDIA_CONTENT_SELECTOR)
 
             # @TODO should I replace \xa0 with ' '?
+            # @TODO should article's first paragraph (without alt names in it's beginning) be placed in description?
             # get alt tags and description
             alt_tags_element = article_content.css(MEMEPEDIA_ALT_TAGS_SELECTOR)
             if len(alt_tags_element) > 0:

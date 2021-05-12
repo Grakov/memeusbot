@@ -62,6 +62,14 @@ It will be mounted on every container to ``/var/www/memeusbot``:
 docker volume create bot_storage
 ```
 
+### docker-compose
+This is the simplest way to deploy the bot:
+```
+docker-compose up -d
+```
+Or you can start services separately via ``docker-compose run``. 
+However, in this scenario you should name ``elasticsearch`` container as ``memeusbot_elastic`` via commandline arguments.
+
 ### Bot
 Make Docker image via ``Dockerfile`` and run container based on it:
 ```
@@ -95,13 +103,14 @@ docker container run -d --name memeusbot_nginx -v bot_storage:/var/www/memeusbot
 
 ## Known issues
 
-Unfortunately on Telegram for Windows search results aren't displayed with bot setting ``IS_SERVERLESS = False``.
+Unfortunately on Telegram for Windows search results sometimes don't show with bot setting ``IS_SERVERLESS = False``.
 
 ## Project structure
 ```
 +--- bot                    # bot directory
 |   +--- .env
 |   +--- main.py            # Main bot script
+|   +--- requirements.txt   # Python pip requirements
 |   +--- search.py          # Searching in memeus ES index
 |   +--- settings.py        # Bot's settings
 +--- crawler                # Scrapy crawler directory
@@ -110,16 +119,15 @@ Unfortunately on Telegram for Windows search results aren't displayed with bot s
 |   +--- items.py 
 |   +--- models.py          # DB tables models
 |   +--- pipelines.py       # Saving scrapped data
+|   +--- requirements.txt   # Python pip requirements
 |   +--- settings.py        # Scrapy settings
 |   +--- spiders
 |   |   +--- memepedia.py   # Spider for memepedia.ru
 |   +--- spider_db.py       # DB config
 +--- elasticsearch          # Dockerfile and configs for dockered Elasticsearch
 +--- nginx                  # Dockerfile and configs for dockered nginx
-+--- www                    # HTTP root
++--- www                    # WWW templates
 |   +--- index.html
-|   +--- static             # Downloaded images directory
 +--- docker-compose.yaml    # Docker-compose config file
-+--- requirements.txt       # Python pip requirements
 +--- scrapy.cfg             # Scrapy cfg-file
 ```

@@ -67,7 +67,7 @@ services:
         max_attempts: 3
         window: 120s
     ports:
-      - 9200:9200
+      - 127.0.0.1:9200:9200
     ulimits:
       memlock:
         soft: -1
