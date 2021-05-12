@@ -17,6 +17,7 @@ VOLUME /var/www/memeusbot
 ENV HOME="/home/memeusbot"
 COPY . $HOME/memeusbot
 RUN chown -R memeusbot:memeusbot $HOME/memeusbot
+RUN chmod +x $HOME/memeusbot/wait-for-it.sh
 
 USER memeusbot
 WORKDIR $HOME/memeusbot

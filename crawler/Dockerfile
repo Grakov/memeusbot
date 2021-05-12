@@ -18,7 +18,8 @@ ENV HOME="/home/memeusbot"
 COPY . $HOME/crawler
 RUN mv $HOME/crawler/scrapy.cfg $HOME/scrapy.cfg
 RUN mv $HOME/crawler/wait-for-it.sh $HOME/wait-for-it.sh
-RUN chown -R memeusbot:memeusbot $HOME/crawler
+RUN chown -R memeusbot:memeusbot $HOME
+RUN chmod +x $HOME/wait-for-it.sh
 
 USER memeusbot
 WORKDIR $HOME
