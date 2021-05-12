@@ -3,9 +3,11 @@ FROM elasticsearch:7.12.1
 VOLUME /usr/share/elasticsearch/data
 EXPOSE 9200
 
-RUN mkdir -p /etc/elasticsearch/hunspell/ru_RU
-COPY ru_RU.* /etc/elasticsearch/hunspell/ru_RU/
+RUN mkdir -p /opt/memeusbot_elastic
+COPY . /opt/memeusbot_elastic/
+RUN chown -R elasticsearch:root /opt/memeusbot_elastic/
+RUN chmod +x /opt/memeusbot_elastic/start.sh
 
+WORKDIR /opt/memeusbot_elastic
 USER elasticsearch:root
-
-ENTRYPOINT ["elasticsearch"]
+ENTRYPOINT ["./start.sh"]

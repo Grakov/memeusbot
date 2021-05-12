@@ -19,7 +19,7 @@ services:
         window: 60s
     volumes:
       - bot_file_storage:/var/www/memeusbot
-    entrypoint: ["./wait-for-it.sh", "memeusbot_elastic:9200", "--", "python", "main.py"]
+    entrypoint: ["./wait-for-it.sh", "-t", "0", "memeusbot_elastic:9200", "--", "python", "main.py"]
     environment:
       - TZ=Europe/Moscow
       - ES_HOST=memeusbot_elastic
@@ -32,7 +32,7 @@ services:
       - elasticsearch
     volumes:
       - bot_file_storage:/var/www/memeusbot
-    entrypoint: ["./wait-for-it.sh", "memeusbot_elastic:9200", "--", "scrapy", "crawl", "memepedia"]
+    entrypoint: ["./wait-for-it.sh", "-t", "0", "memeusbot_elastic:9200", "--", "scrapy", "crawl", "memepedia"]
     environment:
       - TZ=Europe/Moscow
       - ES_HOST=memeusbot_elastic
