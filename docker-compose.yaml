@@ -23,6 +23,8 @@ services:
     environment:
       - TZ=Europe/Moscow
       - ES_HOST=memeusbot_elastic
+      - IS_SERVERLESS=False
+      - DEBUG=True
 
   memeusbot_crawler:
     build: crawler/

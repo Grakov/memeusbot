@@ -7,8 +7,8 @@ if os.environ.get('BOT_TOKEN', None) is None:
     load_dotenv()
 
 BOT_TOKEN = os.environ.get('BOT_TOKEN', 'DO_NOT_PASTE_TOKEN_HERE')
-DEBUG = False
-IS_SERVERLESS = True
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+IS_SERVERLESS = os.environ.get('DEBUG', 'True').lower() == 'true'
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TMP_DIR = os.path.join(BASE_DIR, 'tmp')
