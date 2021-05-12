@@ -8,7 +8,10 @@ services:
   memeusbot_bot:
     build: bot/
     container_name: memeusbot_bot
+    hostname: memeusbot_bot
     restart: unless-stopped
+    depends_on:
+      - elasticsearch
     deploy:
       restart_policy:
         condition: on-failure
@@ -16,6 +19,7 @@ services:
         window: 60s
     volumes:
       - bot_file_storage:/var/www/memeusbot
+    entrypoint: ["./wait-for-it.sh", "memeusbot_elastic:9200", "--", "python", "main.py"]
     environment:
       - TZ=Europe/Moscow
       - ES_HOST=memeusbot_elastic
@@ -23,8 +27,12 @@ services:
   memeusbot_crawler:
     build: crawler/
     container_name: memeusbot_crawler
+    hostname: memeusbot_crawler
+    depends_on:
+      - elasticsearch
     volumes:
       - bot_file_storage:/var/www/memeusbot
+    entrypoint: ["./wait-for-it.sh", "memeusbot_elastic:9200", "--", "scrapy", "crawl", "memepedia"]
     environment:
       - TZ=Europe/Moscow
       - ES_HOST=memeusbot_elastic
@@ -32,6 +40,7 @@ services:
   memeusbot_nginx:
     build: nginx/
     container_name: memeusbot_nginx
+    hostname: memeusbot_nginx
     restart: unless-stopped
     deploy:
       restart_policy:
@@ -39,7 +48,7 @@ services:
         max_attempts: 3
         window: 60s
     ports:
-      - 127.0.0.1:8081:80
+      - 8081:80
     volumes:
       - bot_file_storage:/var/www/memeusbot
     environment:
@@ -48,6 +57,7 @@ services:
   elasticsearch:
     build: elasticsearch/
     container_name: memeusbot_elastic
+    hostname: memeusbot_elastic
     restart: unless-stopped
     deploy:
       restart_policy:
@@ -55,7 +65,7 @@ services:
         max_attempts: 3
         window: 120s
     ports:
-      - 127.0.0.1:9200:9200
+      - 9200:9200
     ulimits:
       memlock:
         soft: -1
