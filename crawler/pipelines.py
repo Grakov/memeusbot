@@ -35,8 +35,6 @@ class MemePipeline(object):
             # downloading file
             http_request = requests.get(image_url)
             if http_request.status_code == 200:
-                sha256_hash = hashlib.sha256(http_request.content).hexdigest()
-
                 # checking if www and www/static exists
                 if not os.path.exists(settings.STATIC_LOCAL_FOLDER):
                     os.makedirs(settings.STATIC_LOCAL_FOLDER, exist_ok=True)
@@ -47,6 +45,8 @@ class MemePipeline(object):
 
                 # saving image
                 file_ext = mimetypes.guess_extension(http_request.headers['content-type'])
+
+                sha256_hash = hashlib.sha256(http_request.content).hexdigest()
                 image_folder = os.path.join(settings.STATIC_LOCAL_FOLDER, sha256_hash)
                 os.mkdir(image_folder)
 
@@ -61,6 +61,13 @@ class MemePipeline(object):
                 thumb_size = ((thumb.width * settings.THUMBNAILS_HEIGHT / thumb.height), settings.THUMBNAILS_HEIGHT)
                 thumb.thumbnail(thumb_size)
                 thumb.save(os.path.join(image_folder, settings.THUMBNAIL_PREFIX + image_filename))
+
+                if settings.OPTIMIZE_IMAGES and file_ext.lower() not in ['.gif']:
+                    optimized_image_filename = settings.DEFAULT_IMAGE_FILENAME + '_opt' + file_ext
+                    optimized_image_path = os.path.join(image_folder, optimized_image_filename)
+                    optimized_image = Image.open(image_full_path)
+                    optimized_image.save(optimized_image_path, optimize=True, quality=settings.QUALITY_FACTOR)
+                    os.replace(optimized_image_path, image_full_path)
 
                 # adding image to ES
                 MemeImporter(es, index_name=settings.ES_INDEX_NAME, doc_name=settings.ES_DOC_TYPE).insert(

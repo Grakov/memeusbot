@@ -10,9 +10,13 @@ sys.path.insert(0, BASE_DIR)
 LOCAL_FOLDER = os.path.join(os.sep, 'var', 'www', 'memeusbot')
 WWW_LOCAL_FOLDER = os.path.join(LOCAL_FOLDER, 'www')
 STATIC_LOCAL_FOLDER = os.path.join(WWW_LOCAL_FOLDER, 'static')
+
 DEFAULT_IMAGE_FILENAME = "image"
 THUMBNAILS_HEIGHT = 200
 THUMBNAIL_PREFIX = "thumb_"
+OPTIMIZE_IMAGES = os.environ.get("CRAWLER_OPTIMIZE_IMAGES", "false").lower() == 'true'
+# QUALITY_FACTOR works only with OPTIMIZE_IMAGES == True
+QUALITY_FACTOR = int(os.environ.get("CRAWLER_IMAGE_QUALITY", "95"))
 
 ES_HOST = os.environ.get('ES_HOST', "localhost")
 ES_PORT = 9200

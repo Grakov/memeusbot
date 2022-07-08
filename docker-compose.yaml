@@ -38,6 +38,7 @@ services:
     environment:
       - TZ=Europe/Moscow
       - ES_HOST=memeusbot_elastic
+      - CRAWLER_OPTIMIZE_IMAGES=False
 
   memeusbot_nginx:
     build: nginx/
