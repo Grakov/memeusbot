@@ -1,6 +1,8 @@
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
 
+import pyguetzli
+
 import shutil
 import requests
 import mimetypes
@@ -65,8 +67,18 @@ class MemePipeline(object):
                 if settings.OPTIMIZE_IMAGES and file_ext.lower() not in ['.gif']:
                     optimized_image_filename = settings.DEFAULT_IMAGE_FILENAME + '_opt' + file_ext
                     optimized_image_path = os.path.join(image_folder, optimized_image_filename)
-                    optimized_image = Image.open(image_full_path)
-                    optimized_image.save(optimized_image_path, optimize=True, quality=settings.QUALITY_FACTOR)
+
+                    if file_ext.lower() in ['.jpeg', '.jpg', '.jpe']:
+                        with open(image_full_path, "rb") as input_file:
+                            input_jpeg = input_file.read()
+                            optimized_jpeg = pyguetzli.process_jpeg_bytes(input_jpeg, quality=settings.QUALITY_FACTOR)
+
+                            with open(optimized_image_path, "wb") as output_file:
+                                output_file.write(optimized_jpeg)
+                    else:
+                        optimized_image = Image.open(image_full_path)
+                        optimized_image.save(optimized_image_path, optimize=True, quality=settings.QUALITY_FACTOR)
+
                     os.replace(optimized_image_path, image_full_path)
 
                 # adding image to ES
